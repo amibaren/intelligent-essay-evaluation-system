@@ -1,0 +1,55 @@
+# 核心依赖 - 基于OxyGent和langextract
+oxygent>=0.1.0
+langextract>=1.0.0
+
+# AI和NLP相关
+openai>=1.0.0
+google-generativeai>=0.3.0
+
+# 数据处理和验证
+pydantic>=2.0.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# 文本处理和中文支持
+jieba>=0.42.1
+pypinyin>=0.47.0
+regex>=2023.0.0
+
+# 配置和环境
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+click>=8.0.0
+
+# 日志和终端美化
+loguru>=0.7.0
+rich>=13.0.0
+
+# 可视化和报告生成
+matplotlib>=3.7.0
+plotly>=5.15.0
+jinja2>=3.1.0
+
+# Web相关 (OxyGent内置FastAPI)
+fastapi>=0.100.0
+uvicorn>=0.23.0
+websockets>=11.0.0
+
+# 开发和测试工具
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.11.0
+pytest-cov>=4.1.0
+
+# 代码质量
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.4.0
+isort>=5.12.0
+
+# 文档生成
+mkdocs>=1.5.0
+mkdocs-material>=9.0.0
+
+# 性能监控
+psutil>=5.9.0

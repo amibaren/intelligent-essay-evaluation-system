@@ -2,6 +2,7 @@
 文本分析师智能体
 
 基于OxyGent ChatAgent + langextract的实现
+使用智能错误处理系统确保稳定性
 """
 
 import asyncio
@@ -15,6 +16,7 @@ from oxygent.utils.env_utils import get_env_var
 
 from prompts.analyst_prompts import SYSTEM_PROMPT, LANGEXTRACT_ANALYSIS_PROMPT
 from langextract_schemas.schema_templates import SchemaTemplateManager, ExtractionTemplate, EssayType, GradeLevel
+from utils.oxygent_error_handler import get_agent_factory
 
 
 def create_text_analyst_agent() -> oxy.ChatAgent:
@@ -23,11 +25,18 @@ def create_text_analyst_agent() -> oxy.ChatAgent:
     
     基于OxyGent ChatAgent + langextract的集成实现
     """
-    return oxy.ChatAgent(  # type: ignore
+    # 使用智能错误处理工厂创建配置
+    factory = get_agent_factory()
+    config = factory.create_chat_agent_config(
         name="text_analyst",
         desc="严谨的文本分析专家，使用langextract进行深度结构化分析",
-        prompt=SYSTEM_PROMPT
+        prompt=SYSTEM_PROMPT,
+        retries=2,           # 最多重试2次
+        timeout=120,         # 120秒超时（langextract分析需要更多时间）
+        semaphore=1,         # 限制并发数量
     )
+    
+    return oxy.ChatAgent(**config)  # type: ignore
 
 
 def process_analysis_input(oxy_request: OxyRequest) -> OxyRequest:

@@ -3,6 +3,7 @@
 深度修复 OxyGent HttpLLM Payload 问题
 
 解决GitHub issue #3: HttpLLM发送无效payload参数导致400错误
+解决智能体间消息传递格式问题，消除"跳过空消息"警告
 采用monkey patching直接修复OxyGent框架内部实现
 """
 
@@ -10,6 +11,16 @@ import json
 import asyncio
 from typing import Dict, Any, Set
 from loguru import logger
+
+# 导入消息验证器
+try:
+    from utils.message_validator import MessageValidator
+except ImportError:
+    # 如果无法导入，创建一个简化版本
+    class MessageValidator:
+        @staticmethod
+        def validate_and_fix_messages(messages):
+            return messages
 
 
 def apply_http_llm_payload_fix():
@@ -41,40 +52,27 @@ def apply_http_llm_payload_fix():
                 # 获取消息，确保格式正确
                 messages = await self._get_messages(oxy_request)
                 
-                # 清理和验证消息格式
-                clean_messages = []
-                for i, msg in enumerate(messages):
-                    if not isinstance(msg, dict):
-                        logger.error(f"❌ 消息格式错误 位置{i}: {type(msg)}")
-                        continue
+                # 使用消息验证器进行统一处理
+                try:
+                    clean_messages = MessageValidator.validate_and_fix_messages(messages)
+                    logger.info(f"✅ 消息验证完成，处理了 {len(messages)} 条原始消息，生成 {len(clean_messages)} 条有效消息")
+                except Exception as validator_error:
+                    logger.warning(f"⚠️ 消息验证器失败，使用备用处理: {validator_error}")
+                    # 备用处理逻辑
+                    clean_messages = []
+                    for i, msg in enumerate(messages):
+                        if isinstance(msg, dict) and msg.get('content', '').strip():
+                            clean_messages.append({
+                                "role": msg.get('role', 'user'),
+                                "content": str(msg.get('content', '')).strip()
+                            })
                     
-                    role = msg.get('role', 'user')
-                    content = msg.get('content', '')
-                    
-                    # 确保内容类型正确并清理
-                    if not isinstance(content, str):
-                        content = str(content)
-                    
-                    # 清理内容中的潜在问题字符和空白
-                    content = content.replace('\x00', '').strip()  # 移除空字符和前后空白
-                    
-                    # 跳过空消息，避免API错误
-                    if not content:
-                        logger.warning(f"⚠️ 跳过空消息 位置{i}: role={role}")
-                        continue
-                    
-                    clean_messages.append({
-                        "role": role,
-                        "content": content
-                    })
-                
-                # 确保至少有一条有效消息
-                if not clean_messages:
-                    logger.error("❌ 没有有效消息，添加默认用户消息")
-                    clean_messages.append({
-                        "role": "user",
-                        "content": "请帮助我处理这个请求。"
-                    })
+                    # 如果备用处理也失败，创建默认消息
+                    if not clean_messages:
+                        clean_messages = [{
+                            "role": "user",
+                            "content": "请帮助我处理这个请求。"
+                        }]
                 
                 # 构建标准payload
                 payload = {

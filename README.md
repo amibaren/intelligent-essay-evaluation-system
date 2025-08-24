@@ -2,16 +2,22 @@
 
 ## 项目简介
 
-本项目基于京东开源的 **OxyGent** 多智能体协作框架和 Google 的 **langextract** 结构化信息提取库，构建了一个"多智能体协作的作文评审小组"系统。通过OxyGent的Oxy原子化组件和MAS(Multi-Agent System)架构，实现五个专业化智能体的协同工作，为小学生提供专业、客观、多维度且充满人文关怀的智能作文批改与反馈服务。
+本项目基于京东开源的 **OxyGent** 多智能体协作框架和 Google 的 **langextract** 结构化信息提取库，构建了一个"多智能体协作的作文评审小组"系统。通过OxyGent的Oxy原子化组件和MAS(Multi-Agent System)架构，实现六个专业化智能体的协同工作，为小学生提供专业、客观、多维度且充满人文关怀的智能作文批改与反馈服务。
+
+**🌟 设计理念**: 用户可以感知完整的多智能体协作过程，通过MasterAgent统一协调，体验专业化分工的魅力。
 
 ## 核心特性
 
-- 🤖 **OxyGent多智能体协作**: 基于京东OxyGent框架的五个专业化智能体分工协作
+- 🤖 **OxyGent多智能体协作**: 基于京东OxyGent框架的六个专业化智能体分工协作
 - 📝 **langextract深度分析**: 使用Google langextract进行结构化文本信息提取
 - 🎯 **动态模板生成**: 根据教学目标和作文类型动态生成评价Schema
 - 💡 **启发式教学理念**: 注重学生自我发现和思考能力培养
 - 📊 **可视化评价报告**: 生成交互式HTML可视化评价报告
 - 🔄 **灵活的Oxy组件**: 基于OxyGent的模块化设计，支持灵活扩展
+- 🌟 **协作过程透明**: 用户可以观察完整的多智能体协作流程
+- 🔒 **智能错误处理**: 内置重试机制、熔断器和性能监控
+- 🚀 **资源优化系统**: 智能缓存、并发控制和性能优化
+- 📊 **监控告警系统**: 实时系统健康监控和告警机制
 
 ## 技术架构
 
@@ -73,9 +79,15 @@ MAS (Multi-Agent System)
 │   └── reporter_prompts.py            # 报告师提示词
 ├── utils/                            # 工具模块
 │   ├── __init__.py
+│   ├── oxygent_error_handler.py       # 智能错误处理系统
+│   ├── state_cache_manager.py         # 状态缓存管理器
+│   ├── resource_optimizer.py          # 资源优化系统
+│   ├── monitoring_system.py           # 监控告警系统
+│   ├── message_validator.py           # 消息验证机制
+│   ├── workflow_manager.py            # 工作流程管理器
 │   ├── text_processor.py              # 文本预处理工具
 │   ├── visualization.py               # 可视化工具(langextract.visualize)
-│   └── logger.py                      # 日志管理
+│   └── performance.py                 # 性能监控工具
 ├── tests/                           # 测试代码
 │   ├── __init__.py
 │   ├── test_agents/                   # 智能体测试
@@ -204,6 +216,11 @@ export LANGEXTRACT_BASE_URL="your-langextract-base-url"
 export LANGEXTRACT_MODEL_ID="your-langextract-model"
 ```
 
+**🔒 安全提示**: 
+- `.env`文件包含敏感的API密钥，已从 Git 仓库中移除
+- 请务必保护好您的API密钥，不要将其上传到公开仓库
+- 建议使用环境变量或密钥管理工具来管理敏感信息
+
 5. **验证配置**
 ```bash
 # 验证配置是否正确
@@ -279,8 +296,22 @@ python -m pytest tests/test_agents/ -v
 
 ## 更新日志
 
-### v0.1.0 (2025-08-23)
-- 初始版本发布
-- 实现基础的多智能体协作框架
-- 集成langextract文本分析功能
-- 提供OxyGent UI支持
+### v0.1.2 (2025-08-24) - 安全优化
+- 🔒 **安全改进**: 从 Git 仓库中移除 .env 文件，保护敏感信息
+- 🛡️ **防泼露机制**: 完善 .gitignore 配置，防止意外上传敏感文件
+- 📝 **开发指南**: 更新环境配置说明，提供安全最佳实践
+
+### v0.1.1 (2025-08-24) - 重大架构重构
+- 🎆 **多智能体协作优化**: 实现用户感知的协作过程
+- 🤖 **MasterAgent 增强**: 作为唯一用户交互入口，协调各专业智能体
+- 🔧 **智能错误处理**: 新增重试机制、熔断器和错误恢复
+- 🚀 **资源优化系统**: 智能缓存、并发控制和性能优化
+- 📊 **监控告警系统**: 实时系统健康监控和告警机制
+- ⚙️ **工作流程管理**: 标准化的智能体协作流程
+- 💬 **消息验证机制**: 确保智能体间通信格式一致
+
+### v0.1.0 (2025-08-23) - 初始版本
+- 🎉 初始版本发布
+- 🔨 实现基础的多智能体协作框架
+- 🔗 集成 langextract 文本分析功能
+- 🌐 提供 OxyGent UI 支持

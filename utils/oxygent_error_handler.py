@@ -29,7 +29,7 @@ class OxyGentErrorHandler:
     def create_oxygent_config(self, 
                             agent_name: str,
                             max_retries: int = 2,
-                            timeout: int = 60,
+                            timeout: int = 180,
                             semaphore: int = 1,
                             circuit_breaker_threshold: int = 5) -> Dict[str, Any]:
         """创建符合OxyGent最佳实践的配置
@@ -308,7 +308,7 @@ def get_agent_factory() -> OxyGentAgentFactory:
 
 def create_smart_error_config(agent_name: str, 
                             retries: int = 2,
-                            timeout: int = 60,
+                            timeout: int = 180,
                             semaphore: int = 1) -> Dict[str, Any]:
     """快速创建智能错误处理配置
     

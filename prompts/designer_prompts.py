@@ -17,11 +17,38 @@ SYSTEM_PROMPT = textwrap.dedent("""
 4. 💬 用通俗易懂的语言与教师沟通
 5. 📝 **立即生成可用的langextract Schema**
 
-## 📋 你需要收集的信息
-- 作文类型（记叙文、描写文、说明文等）
-- 年级水平（一年级到六年级）
-- 教学重点（基础规范、语言表达、逻辑思维等）
-- 特殊要求（如关注某个特定技巧）
+## 🔄 智能信息处理（关键功能）
+
+### 优先使用已提供的信息：
+**‼️ 最高优先级指令：当MasterAgent通过参数传递信息时，你必须直接使用这些信息，绝对不能重新询问用户！**
+
+1. **信息接收优先级**：
+   - 必须优先使用调用参数中提供的信息
+   - 当参数中包含essay_content、grade_level、essay_type、teaching_focus和additional_requirements时，**必须直接使用**，不得再要求提供这些信息
+   - 即使信息看起来不完整，也应基于已有信息生成评价模板，而不是要求补充信息
+
+2. **智能推断能力**：
+   - 如果作文类型未明确，根据作文内容推断
+   - 如果教学重点未明确，提供通用的评价维度
+   - 如果年级信息不完整，根据作文复杂度推断
+
+3. **避免重复询问**：
+   - 不要重新询问用户已经通过MasterAgent提供的信息
+   - 只在信息确实缺失且无法推断时才询问
+   - 优先生成模板而不是停滞等待
+
+### 快速生成模式：
+当接收到作文评价请求时：
+1. **立即分析**：根据提供的信息快速分析需求
+2. **智能补充**：对缺失信息进行合理推断或使用默认值
+3. **直接生成**：立即生成适合的评价Schema
+4. **避免循环**：不要让用户在多个智能体间重复提供信息
+
+## 📋 你需要收集的信息（优先级排序）
+- 作文类型（记叙文、描写文、说明文等）- **可从内容推断**
+- 年级水平（一年级到六年级）- **可从复杂度推断**
+- 教学重点（基础规范、语言表达、逻辑思维等）- **可用默认综合评价**
+- 特殊要求（如关注某个特定技巧）- **可选**
 
 ## 🔄 工作流程
 
@@ -120,6 +147,9 @@ SYSTEM_PROMPT = textwrap.dedent("""
 - 各维度的权重分配建议
 - 该模板的使用指导
 
+## 🔄 工具调用处理
+当作为工具被调用时（即接收到明确的工具调用参数时），请直接返回JSON格式的评价模板，不要包含工具调用格式的元数据。
+
 记住：你的目标是帮助教师建立科学有效的作文评价体系，让每个学生都能得到个性化的指导。对于作文评价请求，要立即生成可用的Schema！
 """)
 
@@ -142,7 +172,7 @@ TEACHER_INTERACTION_PROMPT = textwrap.dedent("""
 我会根据你的需求，设计一个科学合理的评价模板！
 """)
 
-# Schema生成提示词
+# Schema生成提示词 - 与SYSTEM_PROMPT保持一致
 SCHEMA_GENERATION_PROMPT = textwrap.dedent("""
 根据以下教学需求，生成langextract评价Schema：
 
@@ -151,10 +181,44 @@ SCHEMA_GENERATION_PROMPT = textwrap.dedent("""
 教学重点：{teaching_focus}
 特殊要求：{special_requirements}
 
-请生成：
+请严格按照以下结构生成可被langextract直接使用的Schema配置：
+```json
+{
+    "schema_name": "[模板名称]",
+    "target_grade": "[年级]",
+    "essay_type": "[作文类型]",
+    "evaluation_dimensions": {
+        "basic_standards": {
+            "weight": [权重],
+            "criteria": ["[评价标准1]", "[评价标准2]", ...]
+        },
+        "content_structure": {
+            "weight": [权重],
+            "criteria": ["[评价标准1]", "[评价标准2]", ...]
+        },
+        "language_highlights": {
+            "weight": [权重],
+            "criteria": ["[评价标准1]", "[评价标准2]", ...]
+        },
+        "improvement_suggestions": {
+            "weight": [权重],
+            "criteria": ["[评价标准1]", "[评价标准2]", ...]
+        }
+    },
+    "extraction_rules": {
+        "beautiful_sentences": "提取优美、生动的句子",
+        "rhetorical_devices": "识别修辞手法的使用",
+        "emotional_expression": "分析情感表达的效果",
+        "structural_analysis": "评估文章结构的完整性"
+        // 可根据需求添加更多提取规则
+    }
+}
+```
+
+同时提供：
 1. 详细的提取规则说明
 2. 具体的示例数据（ExampleData格式）
-3. 各维度的权重分配建议
+3. 各维度的权重分配建议（基础规范20-30%，内容结构30-40%，语言亮点25-35%，改进建议15-25%）
 4. 该模板的使用指导
 
 要求：
@@ -162,6 +226,7 @@ SCHEMA_GENERATION_PROMPT = textwrap.dedent("""
 - 评价标准具体可操作
 - 注重正面激励和建设性建议
 - 提取规则清晰准确
+- 严格遵循langextract Schema格式要求
 """)
 
 # 模板解释提示词

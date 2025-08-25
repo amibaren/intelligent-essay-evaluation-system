@@ -229,19 +229,39 @@ python scripts/validate_config.py
 
 6. **运行系统**
 ```bash
-python main.py
+# 启动完整系统（推荐）
+python start_system.py --full-system
+
+# 仅启动Web服务
+python start_system.py --web-only
+
+# 仅启动报告服务
+python start_system.py --reports-only
+
+# 检查依赖
+python start_system.py --check-deps
+
+# 查看所有启动选项
+python start_system.py --help
 ```
 
-系统将启动OxyGent Web服务，默认在 http://localhost:8080 提供交互界面。
+系统将启动完整服务：
+- **Web服务**: http://localhost:8000 (OxyGent交互界面)
+- **报告服务**: http://localhost:8081 (报告文件访问)
+
+**💡 提示**: 使用 `--full-system` 模式可以同时启动所有服务，享受完整的系统体验。
 
 ## 使用说明
 
 ### 基本工作流程
 
-1. **配置评价模板**: 教师通过自然语言与"教学模板设计师"对话，确定评价重点
-2. **提交作文**: 上传需要评价的学生作文
-3. **智能分析**: 系统自动完成文本分析和多维度评价
-4. **生成报告**: 输出包含表扬、建议和指导的综合评价报告
+1. **启动系统**: 使用 `python start_system.py --full-system` 启动完整系统
+2. **访问界面**: 打开浏览器访问 http://localhost:8000
+3. **选择智能体**: 选择 "master_agent" 作为交互入口
+4. **配置评价模板**: 通过自然语言描述评价需求（如"三年级记叙文，关注语言表达"）
+5. **提交作文**: 按提示输入或上传作文内容
+6. **智能分析**: 系统自动完成多智能体协作分析
+7. **查看报告**: 在 http://localhost:8081 查看生成的评价报告
 
 ### 核心功能
 
